@@ -27,6 +27,9 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
+	#include "stdio.h"
+	#include <string.h>
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -46,6 +49,10 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
+
+		uint32_t speed_u32 = 1000;
+		int direction_i = 1;
+		char DataChar[100];
 
 /* USER CODE END PV */
 
@@ -92,16 +99,12 @@ int main(void)
   MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
 
-  HAL_GPIO_TogglePin(LED_PC8_GPIO_Port,LED_PC8_Pin);
+		sprintf(DataChar,"\r\n\tThermoStat 2020-march-27 \r\n\tUART1 for debug on speed 115200/8-N-1\r\n\r\n");
+		HAL_UART_Transmit(&huart1, (uint8_t *)DataChar, strlen(DataChar), 100);
+		HAL_GPIO_WritePin(LED_PC9_GPIO_Port,LED_PC9_Pin, SET);
+		HAL_TIM_PWM_Start_IT(&htim3, TIM_CHANNEL_1);
+		HAL_TIM_Base_Start(&htim3);
 
-	  HAL_TIM_PWM_Start_IT(&htim3, TIM_CHANNEL_1);
-	  HAL_TIM_PWM_Start_IT(&htim3, TIM_CHANNEL_2);
-	  HAL_TIM_PWM_Start_IT(&htim3, TIM_CHANNEL_3);
-	  HAL_TIM_PWM_Start_IT(&htim3, TIM_CHANNEL_4);
-
-  	  HAL_TIM_Base_Start(&htim3);
-  	  HAL_TIM_Base_Start_IT(&htim3);
-  	  uint32_t speed_u32 = 100;
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -109,17 +112,30 @@ int main(void)
   while (1)
   {
 		HAL_GPIO_TogglePin(LED_PC8_GPIO_Port,LED_PC8_Pin);
-		HAL_GPIO_TogglePin(LED_PC9_GPIO_Port,LED_PC9_Pin);
-		HAL_Delay(50);
+		HAL_Delay(100);
 
-		speed_u32 = speed_u32 + 1;
-		if (speed_u32 > 180) {
-			speed_u32 = 100;
+		sprintf(DataChar,"%d\r\n", (int)speed_u32);
+		HAL_UART_Transmit(&huart1, (uint8_t *)DataChar, strlen(DataChar), 100);
+
+		if (speed_u32 < 1000) {
+			direction_i = 1;
+			sprintf(DataChar,"\t count UP\r\n");
+			HAL_UART_Transmit(&huart1, (uint8_t *)DataChar, strlen(DataChar), 100);
+			HAL_GPIO_WritePin(LED_PC9_GPIO_Port,LED_PC9_Pin, SET);
 		}
+
+		if (speed_u32 > 1600) {
+			direction_i = -1;
+		  	sprintf(DataChar,"\t count Down\r\n");
+		  	HAL_UART_Transmit(&huart1, (uint8_t *)DataChar, strlen(DataChar), 100);
+		  	HAL_GPIO_WritePin(LED_PC9_GPIO_Port,LED_PC9_Pin, RESET);
+		}
+
+		if (direction_i == 1)	{	speed_u32 = speed_u32 + 2;	}
+		else 					{	speed_u32 = speed_u32 - 2;	}
+
 		TIM3->CCR1 = speed_u32;
-//		if (TIM3->CCR1> 2000) {
-//			TIM3->CCR1 = 500;
-//		}
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
