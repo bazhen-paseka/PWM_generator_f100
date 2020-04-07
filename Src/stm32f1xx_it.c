@@ -199,8 +199,6 @@ void SysTick_Handler(void)
 /* please refer to the startup file (startup_stm32f1xx.s).                    */
 /******************************************************************************/
 
-<<<<<<< HEAD
-=======
 /**
   * @brief This function handles EXTI line0 interrupt.
   */
@@ -217,7 +215,6 @@ void EXTI0_IRQHandler(void)
   /* USER CODE END EXTI0_IRQn 1 */
 }
 
->>>>>>> next
 /* USER CODE BEGIN 1 */
 
 /* USER CODE END 1 */
