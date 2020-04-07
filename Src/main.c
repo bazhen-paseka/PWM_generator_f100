@@ -101,7 +101,7 @@ int main(void)
 
   	  HAL_TIM_Base_Start(&htim3);
   	  HAL_TIM_Base_Start_IT(&htim3);
-
+  	  uint32_t speed_u32 = 100;
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -110,8 +110,13 @@ int main(void)
   {
 		HAL_GPIO_TogglePin(LED_PC8_GPIO_Port,LED_PC8_Pin);
 		HAL_GPIO_TogglePin(LED_PC9_GPIO_Port,LED_PC9_Pin);
-		HAL_Delay(100);
-//		TIM3->CCR1 =+ 20;
+		HAL_Delay(50);
+
+		speed_u32 = speed_u32 + 1;
+		if (speed_u32 > 180) {
+			speed_u32 = 100;
+		}
+		TIM3->CCR1 = speed_u32;
 //		if (TIM3->CCR1> 2000) {
 //			TIM3->CCR1 = 500;
 //		}
