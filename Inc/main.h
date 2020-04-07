@@ -62,6 +62,8 @@ void Error_Handler(void);
 #define LED_PC8_GPIO_Port GPIOC
 #define LED_PC9_Pin GPIO_PIN_9
 #define LED_PC9_GPIO_Port GPIOC
+#define QQQ_Pin GPIO_PIN_8
+#define QQQ_GPIO_Port GPIOA
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */

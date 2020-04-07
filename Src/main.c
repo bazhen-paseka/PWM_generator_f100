@@ -20,6 +20,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "tim.h"
 #include "usart.h"
 #include "gpio.h"
 
@@ -88,8 +89,19 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_USART1_UART_Init();
+  MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
+
   HAL_GPIO_TogglePin(LED_PC8_GPIO_Port,LED_PC8_Pin);
+
+	  HAL_TIM_PWM_Start_IT(&htim3, TIM_CHANNEL_1);
+	  HAL_TIM_PWM_Start_IT(&htim3, TIM_CHANNEL_2);
+	  HAL_TIM_PWM_Start_IT(&htim3, TIM_CHANNEL_3);
+	  HAL_TIM_PWM_Start_IT(&htim3, TIM_CHANNEL_4);
+
+  	  HAL_TIM_Base_Start(&htim3);
+  	  HAL_TIM_Base_Start_IT(&htim3);
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -98,7 +110,11 @@ int main(void)
   {
 		HAL_GPIO_TogglePin(LED_PC8_GPIO_Port,LED_PC8_Pin);
 		HAL_GPIO_TogglePin(LED_PC9_GPIO_Port,LED_PC9_Pin);
-		HAL_Delay(500);
+		HAL_Delay(100);
+//		TIM3->CCR1 =+ 20;
+//		if (TIM3->CCR1> 2000) {
+//			TIM3->CCR1 = 500;
+//		}
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
