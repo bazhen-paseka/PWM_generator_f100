@@ -58,6 +58,7 @@
 				uint32_t	speed_u32		= 0;
 				int			direction_i		= 1;
 				char		DataChar[150]	= {0};
+				uint32_t	capturedValue	= 0;
 
 /* USER CODE END PV */
 
@@ -102,13 +103,22 @@ int main(void)
   MX_GPIO_Init();
   MX_USART1_UART_Init();
   MX_TIM3_Init();
+  MX_TIM4_Init();
   /* USER CODE BEGIN 2 */
 
-		sprintf(DataChar,"\r\n\tPWM generator for three phase motor 2020-April-04 v1.0.0 \r\n\tUART1 for debug on speed 115200/8-N-1\r\n\r\n");
+		sprintf(DataChar,"\r\n\tPWM generator for three phase motor 2020-April-07 v1.0.0 \r\n\tUART1 for debug on speed 115200/8-N-1\r\n\r\n");
 		HAL_UART_Transmit(&huart1, (uint8_t *)DataChar, strlen(DataChar), 100);
 		HAL_GPIO_WritePin(LED_PC9_GPIO_Port,LED_PC9_Pin, SET);
 		HAL_TIM_PWM_Start_IT(&htim3, TIM_CHANNEL_1);
 		//HAL_TIM_Base_Start(&htim3);
+
+			//HAL_TIM_IC_CaptureCallback(&htim4); ???
+		  HAL_TIM_Base_Start(&htim4);
+
+		  HAL_TIM_IC_Start_IT(&htim4, TIM_CHANNEL_1);
+		  HAL_TIM_IC_Start_IT(&htim4, TIM_CHANNEL_2);
+		  int TotalTime=0;
+		  int PulseTime=0;
 
   /* USER CODE END 2 */
 
@@ -146,7 +156,12 @@ int main(void)
 		  	HAL_GPIO_WritePin(LED_PC9_GPIO_Port,LED_PC9_Pin, RESET);
 		}
 
-		sprintf(DataChar,"%d\r\n", (int)speed_u32);
+		  TotalTime = HAL_TIM_ReadCapturedValue(&htim4, TIM_CHANNEL_1);
+		  PulseTime = HAL_TIM_ReadCapturedValue(&htim4, TIM_CHANNEL_2);
+
+		//capturedValue = HAL_TIM_ReadCapturedValue( &htim4, TIM_CHANNEL_1 );
+
+		sprintf(DataChar,"pwm: %d; TT: %d; PT: %d;\r\n", (int)speed_u32, (int)TotalTime, (int)PulseTime );
 		HAL_UART_Transmit(&huart1, (uint8_t *)DataChar, strlen(DataChar), 100);
 
 		TIM3->CCR1 = speed_u32;
