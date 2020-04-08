@@ -27,13 +27,10 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
-<<<<<<< HEAD
-=======
 	//	PWM Out -> PA6
 	//	Debug	UART1 PA9 115200/8-N-1
 	//	Blue button for increment motor speed
 
->>>>>>> next
 	#include "stdio.h"
 	#include <string.h>
 
@@ -57,16 +54,11 @@
 
 /* USER CODE BEGIN PV */
 
-<<<<<<< HEAD
-		uint32_t speed_u32 = 1000;
-		int direction_i = 1;
-		char DataChar[100];
-=======
 	volatile	uint8_t		button_flag		= 0;
 				uint32_t	speed_u32		= 0;
 				int			direction_i		= 1;
-				char		DataChar[150]	= { 0 };
->>>>>>> next
+				char		DataChar[150]	= {0};
+				uint32_t	capturedValue	= 0;
 
 /* USER CODE END PV */
 
@@ -111,21 +103,22 @@ int main(void)
   MX_GPIO_Init();
   MX_USART1_UART_Init();
   MX_TIM3_Init();
+  MX_TIM4_Init();
   /* USER CODE BEGIN 2 */
 
-<<<<<<< HEAD
-		sprintf(DataChar,"\r\n\tThermoStat 2020-march-27 \r\n\tUART1 for debug on speed 115200/8-N-1\r\n\r\n");
-		HAL_UART_Transmit(&huart1, (uint8_t *)DataChar, strlen(DataChar), 100);
-		HAL_GPIO_WritePin(LED_PC9_GPIO_Port,LED_PC9_Pin, SET);
-		HAL_TIM_PWM_Start_IT(&htim3, TIM_CHANNEL_1);
-		HAL_TIM_Base_Start(&htim3);
-=======
-		sprintf(DataChar,"\r\n\tPWM generator for three phase motor 2020-April-04 v1.0.0 \r\n\tUART1 for debug on speed 115200/8-N-1\r\n\r\n");
+		sprintf(DataChar,"\r\n\tPWM generator for three phase motor 2020-April-07 v1.0.0 \r\n\tUART1 for debug on speed 115200/8-N-1\r\n\r\n");
 		HAL_UART_Transmit(&huart1, (uint8_t *)DataChar, strlen(DataChar), 100);
 		HAL_GPIO_WritePin(LED_PC9_GPIO_Port,LED_PC9_Pin, SET);
 		HAL_TIM_PWM_Start_IT(&htim3, TIM_CHANNEL_1);
 		//HAL_TIM_Base_Start(&htim3);
->>>>>>> next
+
+			//HAL_TIM_IC_CaptureCallback(&htim4); ???
+		  HAL_TIM_Base_Start(&htim4);
+
+		  HAL_TIM_IC_Start_IT(&htim4, TIM_CHANNEL_1);
+		  HAL_TIM_IC_Start_IT(&htim4, TIM_CHANNEL_2);
+		  int TotalTime=0;
+		  int PulseTime=0;
 
   /* USER CODE END 2 */
 
@@ -135,31 +128,6 @@ int main(void)
   {
 		HAL_GPIO_TogglePin(LED_PC8_GPIO_Port,LED_PC8_Pin);
 		HAL_Delay(100);
-<<<<<<< HEAD
-
-		sprintf(DataChar,"%d\r\n", (int)speed_u32);
-		HAL_UART_Transmit(&huart1, (uint8_t *)DataChar, strlen(DataChar), 100);
-
-		if (speed_u32 < 1000) {
-			direction_i = 1;
-			sprintf(DataChar,"\t count UP\r\n");
-			HAL_UART_Transmit(&huart1, (uint8_t *)DataChar, strlen(DataChar), 100);
-			HAL_GPIO_WritePin(LED_PC9_GPIO_Port,LED_PC9_Pin, SET);
-		}
-
-		if (speed_u32 > 1600) {
-			direction_i = -1;
-		  	sprintf(DataChar,"\t count Down\r\n");
-		  	HAL_UART_Transmit(&huart1, (uint8_t *)DataChar, strlen(DataChar), 100);
-		  	HAL_GPIO_WritePin(LED_PC9_GPIO_Port,LED_PC9_Pin, RESET);
-		}
-
-		if (direction_i == 1)	{	speed_u32 = speed_u32 + 2;	}
-		else 					{	speed_u32 = speed_u32 - 2;	}
-=======
-
-		if (direction_i == 1) { speed_u32 += 2; }
-		else 				  { speed_u32 -= 2; }
 
 		if (button_flag == 1 ) {
 			speed_u32 += 100;
@@ -168,6 +136,9 @@ int main(void)
 			HAL_Delay(200);
 			button_flag = 0;
 		}
+
+		if (direction_i == 1) { speed_u32 += 2; }
+		else 				  { speed_u32 -= 2; }
 
 		if (speed_u32 < 1000) {
 			speed_u32 = 1000;
@@ -185,9 +156,13 @@ int main(void)
 		  	HAL_GPIO_WritePin(LED_PC9_GPIO_Port,LED_PC9_Pin, RESET);
 		}
 
-		sprintf(DataChar,"%d\r\n", (int)speed_u32);
+		  TotalTime = HAL_TIM_ReadCapturedValue(&htim4, TIM_CHANNEL_1);
+		  PulseTime = HAL_TIM_ReadCapturedValue(&htim4, TIM_CHANNEL_2);
+
+		//capturedValue = HAL_TIM_ReadCapturedValue( &htim4, TIM_CHANNEL_1 );
+
+		sprintf(DataChar,"pwm: %d; TT: %d; PT: %d;\r\n", (int)speed_u32, (int)TotalTime, (int)PulseTime );
 		HAL_UART_Transmit(&huart1, (uint8_t *)DataChar, strlen(DataChar), 100);
->>>>>>> next
 
 		TIM3->CCR1 = speed_u32;
 
